@@ -1,5 +1,5 @@
-#test
-#test2
+
+
 
 
 # Install packages  -------------------------------------------------------
@@ -1461,24 +1461,7 @@ plot(duration.OUT)
 
 
 # Test if variables meet model assumptions -----------------------------------------------------
-##for multiple linear regression models 
-
-######All model datasets met the basic assumptions of the relevant regression: 
-######Linear regression:
-######  1.	Linear relationship between independent and dependent variable: all continuous independent and continuous dependent variables were plotted and Pearson’s Product Moment Correlation Coefficient (PPMCC) used to test for significant correlation. Box plots were used to test linear relationship between ordinal independent variables and continuous dependent variables. QQ plots were used to test for linearity amongst nominal, ordinal and continuous independent variables and continuous dependent variables. In all cases, variables which were not approximately linearly related (p values >0.05 for PPMCC) were not included in linear regression analyses.
-######2.	Normal distribution of model residuals: for models with continuous dependent variables, QQ plots used to test residual normality and any models with non-normally distributed residuals were removed. All continuous variables were plotted in order to ensure sample values were approximately normally distributed and log transformed if necessary. N/A for ordinal and nominal independent variables. 
-######3.	Homoscedasticity: xx? 
-  
-######logistic regression:
-######1.	Linear relationship between independent and ln(odds) of dependent variable: N/A xx There are plots of variance that we can use to look at these, we'll chat on Thursday about it.
-######2.	Normal distribution of model residuals: for models with binary dependent variables, QQ plots used to test residual normality and any models with non-normally distributed residuals were removed xx?.
-######3.	Homoscedasticity: xx?
-
-######multiple linear or logistic regression:
-######4.	Little or no multicollinearity between independent variables where relevant: when constructing multiple regression models, the effect of removing each biologically related variable on other covariates in the model was tested to ensure no significant changes to the rest of the model were induced once a variable was omitted. 
-
-######(https://onlinelibrary.wiley.com/doi/pdf/10.1111/ceo.12358). 
-
+##for multiple linear regression models
 
 ##1 linear relationship between independent and dependent variables (or log(odds) for logistic regression)
 ### check QQ plots

@@ -1,5 +1,5 @@
-#test
-#test2
+
+
 
 
 # Install packages  -------------------------------------------------------
@@ -94,7 +94,6 @@ data6 <- subset(data5, unique.records ==1)#according to DID NOT travel
 
 data7 <- subset(datain, unique.records ==1) #all dataset unique records
 
-#n.b type 1 corresponds to Index case identification carried out primarily through passive case investigation (2010-2014) ; type 2 corresponds to Reactive case detection (RACD), in which all people residing within 1km (January 2010 to June 2013) or 500m (July 2013 to June 2014) radius of index case are surveyed (and subsequently referred for treatment if tested positive) (2012-2014 only)
 
 
 # Create new datasets -----------------------------------------------------
@@ -102,11 +101,8 @@ data7 <- subset(datain, unique.records ==1) #all dataset unique records
 ###age variable select###
 #####with this step you can select the order of the variable, drop values and select which will be the value where you compared the others against so it goes first in the list.
 #####these occupation variables should be used for all analyses involving occupation_code 
-data4$selected_age<-  factor(data4$age_class, levels=c('1','2','3','4','5','6','7')) 
-data4$selected_age_anynightsaway = data4$selected_age
-table(data4$selected_age,useNA = "always")
-data4$selected_age_anynightsaway[-which(data4$nightsaway!=""&data4$nightsaway!="-Inf"&data4$nightsaway!="Inf"&data4$nightsaway!="0")] <- NA
-#data4_selected_age_nightsawaydata<-  factor(subset(data4,nightsaway!=""&nightsaway!="-Inf"&nightsaway!="Inf"&nightsaway!="0")$age_class, levels=c('1','2','3','4','5','6','7')) 
+data4_selected_age<-  factor(data4$age_class, levels=c('1','2','3','4','5','6','7')) 
+data4_selected_age_nightsawaydata<-  factor(subset(data4,nightsaway!=""&nightsaway!="-Inf"&nightsaway!="Inf"&nightsaway!="0")$age_class, levels=c('1','2','3','4','5','6','7')) 
 ###occupation variable select###
 #####with this step you can select the order of the variable, drop values and select which will be the value where you compared the others against so it goes first in the list.
 #####these occupation variables should be used for all analyses involving occupation_code 
@@ -165,7 +161,7 @@ data4_students<-subset(data4,Occupation_code==8)
 ###BorderPost datasets
 data4_Mhlumeni_Goba<-subset(data4,BorderPost=="Mhlumeni/Goba")
 data4_not_Mhlumeni_Goba<-subset(data4,BorderPost!="Mhlumeni/Goba")
-table(data4$Occupation_code)
+
 ####data with distance variable by occupation code
 data4_occupation_code1=subset(data4,Occupation_code==1)
 length(data4_occupation_code1$ID)
@@ -245,7 +241,6 @@ data4_malariapositive<-subset(data4,Malaria_0_1==1)
 data4_malarianegative<-subset(data4,Malaria_0_1==0)
 
 
-
 mean(data4_malariapositive$distance_out)/1000
 mean(data4_malarianegative$distance_out)/1000
 mean(data4_malariapositive$falciparum_travel_prevalence)
@@ -263,70 +258,6 @@ mean(subset(data4positive,is.na(nightsaway)==FALSE)$nightsaway)
 mean(subset(data4negative,is.na(nightsaway)==FALSE)$nightsaway)
 length(subset(data4negative, High.risk.month==1)$ID)/length(data4negative$ID)
 length(subset(data4positive, High.risk.month==1)$ID)/length(data4positive$ID)
-
-
-MonthMeanFalcipTable<-aggregate(data4[,c("falciparum_travel_prevalence","distance_out", "Age","nightsaway")], by=list("Month.travel"=data4$Month.travel), FUN= "mean", na.rm=TRUE)
-MonthSDFalcipTable<-aggregate(data4[,c("falciparum_travel_prevalence","distance_out", "Age","nightsaway")], by=list("Month.travel"=data4$Month.travel), FUN= "sd", na.rm=TRUE)
-MonthMeanSdTable<- ddply(data4, c("Month.travel"), summarise,
-                         n_month = length(Month.travel),
-                         distance_sd   = sd(distance_out, na.rm=TRUE),
-                         distance_mean = mean(distance_out, na.rm=TRUE),
-                         falcip_sd  = sd(falciparum_travel_prevalence, na.rm=TRUE),
-                         falcip_mean = mean(falciparum_travel_prevalence, na.rm=TRUE)
-)
-MonthReasonHolidayTable<- ddply(subset(data4, ReasonTravel=="Holiday"), c("Month.travel"), summarise,
-                         n = length(ReasonTravel))
-MonthReasonVisitingTable<- ddply(subset(data4, ReasonTravel=="Visiting"), c("Month.travel"), summarise,
-                                n = length(ReasonTravel))
-MonthReasonOtherTable<- ddply(subset(data4, ReasonTravel=="Other"), c("Month.travel"), summarise,
-                                 n = length(ReasonTravel))
-MonthReasonBusinessTable<- ddply(subset(data4, ReasonTravel=="Business"), c("Month.travel"), summarise,
-                              n = length(ReasonTravel))
-HighRiskMonthMeanSdTable<- ddply(data4, c("High.risk.month"), summarise,
-                         n_month = length(Month.travel),
-                         distance_sd   = sd(distance_out, na.rm=TRUE),
-                         distance_mean = mean(distance_out, na.rm=TRUE),
-                         falcip_sd  = sd(falciparum_travel_prevalence, na.rm=TRUE),
-                         falcip_mean = mean(falciparum_travel_prevalence, na.rm=TRUE),
-                         age_mean = mean(Age, na.rm=TRUE),
-                         age_sd = sd(Age, na.rm=TRUE),
-                         distance_max = max(distance_out, na.rm = TRUE),
-                         distance_min = min(distance_out, na.rm = TRUE)
-)
-AgeGroupNTable<- ddply(data4, c("age_class"), summarise,
-                                 n_age_class = length(age_class))
-OccupationCodeNTable<- ddply(data4, c("Occupation_code"), summarise,
-                       n_age_class = length(Occupation_code))
-CountryNTable<- ddply((subset(data4, High.risk.month=="0")), c("Country"), summarise,
-                             n_country = length(Country))
-
-
-write.csv(MonthMeanFalcipTable, file = "MonthMeanFalcipTable.csv")
-library(plyr)
-CountryMeanSDFalcipTable <- ddply(data4, c("Country"), summarise,
-                                     n_country = length(Country),
-                                     distance_sd   = sd(distance_out, na.rm=TRUE),
-                                     distance_mean = mean(distance_out, na.rm=TRUE),
-                                     falcip_sd  = sd(falciparum_travel_prevalence, na.rm=TRUE),
-                                     falcip_mean = mean(falciparum_travel_prevalence, na.rm=TRUE)
-                                    )
-mean_falcip_by_country_bar<-ggplot(data=CountryMeanSDFalcipTable, aes(x=Country,y=falcip_mean)) + geom_col()
-       
-month_vs_mean_prevalence_bar<-qplot(x=as.factor(MonthMeanFalcipTable$Month.travel),y=as.factor(MonthMeanFalcipTable$falciparum_travel_prevalence), geom="col")
-month_vs_mean_distance_bar<-qplot(x=as.factor(MonthMeanFalcipTable$Month.travel),y=as.factor(MonthMeanFalcipTable$distance_out), geom="col")
-month_vs_distance_scatter<-qplot(x=month(as.Date(data4$FirstEntered, format="%d/%m/%Y")),y=data4$distance_out)
-month_vs_prevalence_scatter<-qplot(x=month(as.Date(data4$FirstEntered, format="%d/%m/%Y")),y=data4$falciparum_travel_prevalence)
-country_vs_prevalence_scatter<-qplot(x=data4$Country,y=data4$falciparum_travel_prevalence)
-country_vs_distance_scatter<-qplot(x=data4$Country,y=data4$distance_out)
-country_vs_sd_prevalence_scatter<-qplot(x=CountryMeanSDFalcipTable$Country,y=CountryMeanSDFalcipTable$falcip_sd)
-country_vs_sd_distance_scatter<-qplot(x=CountryMeanSDFalcipTable$Country,y=CountryMeanSDFalcipTable$distance_sd)
-country_vs_mean_prevalence_scatter<-qplot(x=CountryMeanSDFalcipTable$Country,y=CountryMeanSDFalcipTable$falcip_mean)
-country_vs_mean_distance_scatter<-qplot(x=CountryMeanSDFalcipTable$Country,y=CountryMeanSDFalcipTable$distance_mean)
-
-
-               
-
-
 
 ###overview of datain
 library(lubridate)
@@ -424,17 +355,6 @@ data4_occupation_codeNA=subset(data4,is.na(Occupation_code)==TRUE)
 length(data4_occupation_codeNA$ID)#these should total length(data4$ID)
 
 ####
-data4selected_occ = subset(data4,is.element(Occupation_code,c(1:8)))
-distribution_of_distances_travelled_outside_Swaziland_for_different_occupation_groups2<- ggplot() +
-  geom_density(data=data4selected_occ, aes(x=distance_out, colour=as.factor(Occupation_code))) +
-   scale_colour_manual("", 
-                      breaks = c(1,2,3,4,5,6,7,8),
-                      values = c("grey", "grey", "grey","blue","green","red","grey","grey"),
-                      labels = c("Unemployed","Farming/Agriculture","Manufacturing/Factory","Office/Clerical Work","Other","Other Manual Labour","Small-market sales or trade","Student")) +
-  labs(x="Distance travelled (m)",y="Probability density",fill="Occupation",title = "Continuous distibution of distances travelled outside Swaziland \nfor different occupation groups") +
-  theme_classic() +
-  theme(legend.position = "bottom") 
-
 distribution_of_distances_travelled_outside_Swaziland_for_different_occupation_groups<- ggplot() +
   geom_density(data=data4_occupation_code1, aes(x=data4_occupation_code1$distance_out, colour="data4_occupation_code1$distance_out")) +
   geom_density(data=data4_occupation_code2, aes(x=data4_occupation_code2$distance_out, colour="data4_occupation_code2$distance_out")) +
@@ -673,21 +593,6 @@ cases_each_travel_month<- ggplot(data=subset(data4,Month.travel!=""), aes(as.fac
 cases_each_travel_month 
 
 library(ggplot2)
-reasontravel_cases_each_travel_month<- ggplot(data=subset(data4,Month.travel!=""), aes(as.factor(subset(data4,Month.travel!="")$Month.travel), fill = as.factor(subset(data4,Month.travel!="")$ReasonTravel))) +
-  geom_bar(na.rm = TRUE) + 
-  scale_fill_brewer(palette="Set1",name="Reason for travel", breaks=c("Business","Holiday", "Other", "Visiting"),labels=c("Business","Holiday", "Other", "Visiting"))+
-  labs(title = "Histogram showing frequency of travel by  \nreason for travel for different months \ntravelled, 2012-2014") +
-  xlab("Month of travel") +
-  ylab("Frequency") +
-  theme (text = element_text(face="plain",size = 8)) +
-  theme (plot.title = element_text(size = rel(1.5),face="bold")) +
-  theme (axis.title = element_text(size = rel(1.2),face="bold")) +
-  theme (legend.position = "bottom") +
-  scale_x_discrete(name= waiver(),position = "bottom", labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
-reasontravel_cases_each_travel_month
-
-
-library(ggplot2)
 malaria_cases_each_travel_firstentered<- ggplot(data=subset(data4,FirstEntered!=""), aes(as.factor(month(as.Date(subset(data4,FirstEntered!="")$FirstEntered,format = "%d/%m/%Y"))), fill = as.factor(subset(data4,FirstEntered!="")$Malaria_0_1))) +
   geom_bar() + 
   scale_fill_brewer(palette="Set1",name="Malaria", breaks=c(0,1),labels=c("Negative","Positive"))+
@@ -875,8 +780,7 @@ duration_and_borderpost_continuous_distribution<- ggplot() +
 
 
 
-##correlations
-cor.test(data4$distance_out, data4$falciparum_travel_prevalence, method="pearson",alternative = "two.sided") # r value and two tailed one sample t test to test whether value for r is significantly different to zero (meaning there is insufficient evidence to accept that there is a relationship between p falcip and distance)
+
 
 
 
@@ -908,13 +812,13 @@ malaria_time.OUT<-glm(as.factor(Malaria_0_1) ~ as.factor(Month.travel), data = d
 summary(malaria_time.OUT)
 conf.malaria_time.OUT<-confint(malaria_time.OUT, level=0.95)
 exp.malaria_time.OUT<-exp(coef(malaria_time.OUT))
-exp.conf.malaria_time.OUT<-exp(confint(malaria_time.OUT)) 
+exp.conf.malaria_time.OUT<-exp(confint(malaria_time.OUT))
 
 malaria_time_binary.OUT<-glm(as.factor(Malaria_0_1) ~ as.factor(High.risk.month), data = data4, family=binomial(link=logit))
 summary(malaria_time_binary.OUT)
-conf.malaria_time_binary.OUT<-confint(malaria_time_binary.OUT, level=0.95)
-exp.malaria_time_binary.OUT<-exp(coef(malaria_time_binary.OUT))
-exp.conf.malaria_time_binary.OUT<-exp(confint(malaria_time_binary.OUT))
+conf.malaria_time.OUT<-confint(malaria_time.OUT, level=0.95)
+exp.malaria_time.OUT<-exp(coef(malaria_time.OUT))
+exp.conf.malaria_time.OUT<-exp(confint(malaria_time.OUT))
 
 malaria_country.OUT<-glm(as.factor(Malaria_0_1) ~ data4_selected_countries,data = data4, family=binomial(link=logit)) # distance modelled by occupation. nb. warnings are valid - variation between 1 and 0 for malaria only exists in Mozambique, Nigeria, South Africa and Zimbabwe
 summary(malaria_country.OUT)
@@ -1144,6 +1048,162 @@ exp.conf.time_binary_duration.OUT<-exp(confint(time_binary_duration.OUT))
 
 
 
+Month.travel_relevel<-relevel(as.factor(data4$Month.travel.name), ref="Jan") # base month against which to compare probability of travel during each other month (for each variable, e.g. each age class)
+time_age.OUT<-multinom(Month.travel_relevel~ as.factor(age_class), data = data4) 
+summary(time_age.OUT)
+coef.time_age.OUT<-coef(time_age.OUT) #stand alone coefficients of model 
+summary(time_age.OUT)$standard.errors #stand alone standard errors of model
+exp.time_age.OUT<-exp(coef(time_age.OUT))
+confint(time_age.OUT,level = 0.95)
+conf.time_age.OUT<-exp(confint(time_age.OUT))
+time_age.OUT_zvalues<-summary(time_age.OUT)$coefficients/summary(time_age.OUT)$standard.errors #gives z values
+time_age.OUT_zvalues
+time_age.OUT_pvalues<-pnorm(abs(time_age.OUT_zvalues), lower.tail=FALSE)*2#gives p values 
+time_age.OUT_pvalues
+time_age.OUT_signif <- symnum(time_age.OUT_pvalues, corr = FALSE, na = FALSE, 
+      cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1), symbols = c("***", "**", "*", ".", " "), legend = TRUE ) #gives significance stars
+paste(time_age.OUT_pvalues,time_age.OUT_signif, sep = " ")# gives table with p values and significance stars
+
+
+
+Month.travel_relevel<-relevel(as.factor(data4$Month.travel.name), ref="Jan") # base month against which to compare probability of travel during each other month (for each variable, e.g. each age class)
+time_occupation.OUT<-multinom(Month.travel_relevel~ as.factor(data4_selected_occupations), data = data4) 
+summary(time_occupation.OUT)
+coef.time_occupation.OUT<-coef(time_occupation.OUT) #stand alone coefficients of model 
+summary(time_occupation.OUT)$standard.errors #stand alone standard errors of model
+exp.time_occupation.OUT<-exp(coef(time_occupation.OUT))
+confint(time_occupation.OUT,level = 0.95)
+conf.time_occupation.OUT<-exp(confint(time_occupation.OUT))
+time_occupation.OUT_zvalues<-summary(time_occupation.OUT)$coefficients/summary(time_occupation.OUT)$standard.errors #gives z values
+time_occupation.OUT_zvalues
+time_occupation.OUT_pvalues<-pnorm(abs(time_occupation.OUT_zvalues), lower.tail=FALSE)*2#gives p values 
+time_occupation.OUT_pvalues
+time_occupation.OUT_signif <- symnum(time_occupation.OUT_pvalues, corr = FALSE, na = FALSE, 
+                 cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1), symbols = c("***", "**", "*", ".", " "), legend = TRUE ) #gives significance stars
+paste(time_occupation.OUT_pvalues,time_occupation.OUT_signif, sep = " ")# gives table with p values and significance stars
+
+
+
+Month.travel_relevel<-relevel(as.factor(data4$Month.travel.name), ref="Jan") # base month against which to compare probability of travel during each other month (for each variable, e.g. each age class)
+time_gender.OUT<-multinom(Month.travel_relevel~ as.factor(data4_selected_genders), data = data4) 
+summary(time_gender.OUT)
+coef.time_gender.OUT<-coef(time_gender.OUT) #stand alone coefficients of model 
+summary(time_gender.OUT)$standard.errors #stand alone standard errors of model
+exp.time_gender.OUT<-exp(coef(time_gender.OUT))
+confint(time_gender.OUT,level = 0.95)
+conf.time_gender.OUT<-exp(confint(time_gender.OUT))
+time_gender.OUT_zvalues<-summary(time_gender.OUT)$coefficients/summary(time_gender.OUT)$standard.errors #gives z values
+time_gender.OUT_zvalues
+time_gender.OUT_pvalues<-pnorm(abs(time_gender.OUT_zvalues), lower.tail=FALSE)*2#gives p values 
+time_gender.OUT_pvalues
+time_gender.OUT_signif <- symnum(time_gender.OUT_pvalues, corr = FALSE, na = FALSE, 
+                 cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1), symbols = c("***", "**", "*", ".", " "), legend = TRUE ) #gives significance stars
+paste(time_gender.OUT_pvalues,time_gender.OUT_signif, sep = " ")# gives table with p values and significance stars
+
+
+
+Month.travel_relevel<-relevel(as.factor(data4$Month.travel.name), ref="Jan") # base month against which to compare probability of travel during each other month (for each variable, e.g. each age class)
+time_reason_travel.OUT<-multinom(Month.travel_relevel~ as.factor(data4_selected_ReasonTravel), data = data4) 
+summary(time_reason_travel.OUT)
+coef.time_reason_travel.OUT<-coef(time_reason_travel.OUT) #stand alone coefficients of model 
+summary(time_reason_travel.OUT)$standard.errors #stand alone standard errors of model
+exp.time_reason_travel.OUT<-exp(coef(time_reason_travel.OUT))
+confint(time_reason_travel.OUT,level = 0.95)
+conf.time_reason_travel.OUT<-exp(confint(time_reason_travel.OUT))
+time_reason_travel.OUT_zvalues<-summary(time_reason_travel.OUT)$coefficients/summary(time_reason_travel.OUT)$standard.errors #gives z values
+time_reason_travel.OUT_zvalues
+time_reason_travel.OUT_pvalues<-pnorm(abs(time_reason_travel.OUT_zvalues), lower.tail=FALSE)*2#gives p values 
+time_reason_travel.OUT_pvalues
+time_reason_travel.OUT_signif <- symnum(time_reason_travel.OUT_pvalues, corr = FALSE, na = FALSE, 
+                                 cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1), symbols = c("***", "**", "*", ".", " "), legend = TRUE ) #gives significance stars
+paste(time_reason_travel.OUT_pvalues,time_reason_travel.OUT_signif, sep = " ")# gives table with p values and significance stars
+
+Month.travel_relevel<-relevel(as.factor(data4$Month.travel.name), ref="Jan") # base month against which to compare probability of travel during each other month (for each variable, e.g. each age class)
+time_means_travel.OUT<-multinom(Month.travel_relevel~ as.factor(data4_selected_MeansTravel), data = data4) 
+summary(time_means_travel.OUT)
+coef.time_means_travel.OUT<-coef(time_means_travel.OUT) #stand alone coefficients of model 
+summary(time_means_travel.OUT)$standard.errors #stand alone standard errors of model
+exp.time_means_travel.OUT<-exp(coef(time_means_travel.OUT)) 
+confint(time_means_travel.OUT,level = 0.95)
+conf.time_means_travel.OUT<-exp(confint(time_means_travel.OUT))
+time_means_travel.OUT_zvalues<-summary(time_means_travel.OUT)$coefficients/summary(time_means_travel.OUT)$standard.errors #gives z values
+time_means_travel.OUT_zvalues
+time_means_travel.OUT_pvalues<-pnorm(abs(time_means_travel.OUT_zvalues), lower.tail=FALSE)*2#gives p values 
+time_means_travel.OUT_pvalues
+time_means_travel.OUT_signif <- symnum(time_means_travel.OUT_pvalues, corr = FALSE, na = FALSE, 
+                                        cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1), symbols = c("***", "**", "*", ".", " "), legend = TRUE ) #gives significance stars
+paste(time_means_travel.OUT_pvalues,time_means_travel.OUT_signif, sep = " ")# gives table with p values and significance stars
+
+
+Month.travel_relevel<-relevel(as.factor(data4$Month.travel.name), ref="Jan") # base month against which to compare probability of travel during each other month (for each variable, e.g. each age class)
+time_border_post.OUT<-multinom(Month.travel_relevel~ as.factor(data4_selected_BorderPost), data = data4) 
+summary(time_border_post.OUT)
+coef.time_border_post.OUT<-coef(time_border_post.OUT) #stand alone coefficients of model 
+summary(time_border_post.OUT)$standard.errors #stand alone standard errors of model
+exp.time_border_post.OUT<-exp(coef(time_border_post.OUT)) 
+confint(time_border_post.OUT,level = 0.95)
+conf.time_border_post.OUT<-exp(confint(time_border_post.OUT))
+time_border_post.OUT_zvalues<-summary(time_border_post.OUT)$coefficients/summary(time_border_post.OUT)$standard.errors #gives z values
+time_border_post.OUT_zvalues
+time_border_post.OUT_pvalues<-pnorm(abs(time_border_post.OUT_zvalues), lower.tail=FALSE)*2#gives p values 
+time_border_post.OUT_pvalues
+time_border_post.OUT_signif <- symnum(time_border_post.OUT_pvalues, corr = FALSE, na = FALSE, 
+                                       cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1), symbols = c("***", "**", "*", ".", " "), legend = TRUE ) #gives significance stars
+paste(time_border_post.OUT_pvalues,time_border_post.OUT_signif, sep = " ")# gives table with p values and significance stars
+
+Month.travel_relevel<-relevel(as.factor(data4$Month.travel.name), ref="Jan") # base month against which to compare probability of travel during each other month (for each variable, e.g. each age class)
+time_pop_HOME.OUT<-multinom(Month.travel_relevel~ pop.HOME, data = data4) 
+summary(time_pop_HOME.OUT)
+coef.time_pop_HOME.OUT<-coef(time_pop_HOME.OUT) #stand alone coefficients of model 
+summary(time_pop_HOME.OUT)$standard.errors #stand alone standard errors of model
+exp.time_pop_HOME.OUT<-exp(coef(time_pop_HOME.OUT)) 
+confint(time_pop_HOME.OUT,level = 0.95)
+conf.time_pop_HOME.OUT<-exp(confint(time_pop_HOME.OUT))
+time_pop_HOME.OUT_zvalues<-summary(time_pop_HOME.OUT)$coefficients/summary(time_pop_HOME.OUT)$standard.errors #gives z values
+time_pop_HOME.OUT_zvalues
+time_pop_HOME.OUT_pvalues<-pnorm(abs(time_pop_HOME.OUT_zvalues), lower.tail=FALSE)*2#gives p values 
+time_pop_HOME.OUT_pvalues
+time_pop_HOME.OUT_signif <- symnum(time_pop_HOME.OUT_pvalues, corr = FALSE, na = FALSE, 
+                                      cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1), symbols = c("***", "**", "*", ".", " "), legend = TRUE ) #gives significance stars
+paste(time_pop_HOME.OUT_pvalues,time_pop_HOME.OUT_signif, sep = " ")# gives table with p values and significance stars
+
+
+Month.travel_relevel<-relevel(as.factor(data4$Month.travel.name), ref="Jan") # base month against which to compare probability of travel during each other month (for each variable, e.g. each age class)
+time_pop_urban_rural_distance.OUT<-multinom(Month.travel_relevel~ HOME_urban_rural_distance..degrees., data = data4) 
+summary(time_pop_urban_rural_distance.OUT)
+coef.time_pop_urban_rural_distance.OUT<-coef(time_pop_urban_rural_distance.OUT) #stand alone coefficients of model 
+summary(time_pop_urban_rural_distance.OUT)$standard.errors #stand alone standard errors of model
+exp.time_pop_urban_rural_distance.OUT<-exp(coef(time_pop_urban_rural_distance.OUT)) 
+confint(time_pop_urban_rural_distance.OUT,level = 0.95)
+conf.time_pop_urban_rural_distance.OUT<-exp(confint(time_pop_urban_rural_distance.OUT))
+time_pop_urban_rural_distance.OUT_zvalues<-summary(time_pop_urban_rural_distance.OUT)$coefficients/summary(time_pop_urban_rural_distance.OUT)$standard.errors #gives z values
+time_pop_urban_rural_distance.OUT_zvalues
+time_pop_urban_rural_distance.OUT_pvalues<-pnorm(abs(time_pop_urban_rural_distance.OUT_zvalues), lower.tail=FALSE)*2#gives p values 
+time_pop_urban_rural_distance.OUT_pvalues
+time_pop_urban_rural_distance.OUT_signif <- symnum(time_pop_urban_rural_distance.OUT_pvalues, corr = FALSE, na = FALSE, 
+                                   cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1), symbols = c("***", "**", "*", ".", " "), legend = TRUE ) #gives significance stars
+paste(time_pop_urban_rural_distance.OUT_pvalues,time_pop_urban_rural_distance.OUT_signif, sep = " ")# gives table with p values and significance stars
+
+
+Month.travel_relevel<-relevel(as.factor(data4$Month.travel.name), ref="Jan") # base month against which to compare probability of travel during each other month (for each variable, e.g. each age class)
+time_distance.OUT<-multinom(Month.travel_relevel~ distance_out, data = data4) 
+summary(time_distance.OUT)
+coef.time_distance.OUT<-coef(time_distance.OUT) #stand alone coefficients of model 
+summary(time_distance.OUT)$standard.errors #stand alone standard errors of model
+exp.time_distance.OUT<-exp(coef(time_distance.OUT)) 
+confint(time_distance.OUT,level = 0.95)
+conf.time_distance.OUT<-exp(confint(time_distance.OUT))
+time_distance.OUT_zvalues<-summary(time_distance.OUT)$coefficients/summary(time_distance.OUT)$standard.errors #gives z values
+time_distance.OUT_zvalues
+time_distance.OUT_pvalues<-pnorm(abs(time_pop_urban_rural_distance.OUT_zvalues), lower.tail=FALSE)*2#gives p values 
+time_distance.OUT_pvalues
+time_distance.OUT_signif <- symnum(time_distance.OUT_pvalues, corr = FALSE, na = FALSE, 
+                                                   cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1), symbols = c("***", "**", "*", ".", " "), legend = TRUE ) #gives significance stars
+paste(time_distance.OUT_pvalues,time_distance.OUT_signif, sep = " ")# gives table with p values and significance stars
+
+
+
+
 
 
 
@@ -1199,34 +1259,61 @@ exp.conf.duration_pop_urban_rural_distance.OUT<-exp(confint(duration_pop_urban_r
 
 # ###Multiple linear and logistic regression univariate models ------------
 
+distance.OUT<-glm(log(distance_out) ~ as.factor(data4_selected_occupations) + as.factor(age_class) + as.factor(data4_selected_genders) + as.factor(data4_selected_ReasonTravel) + as.factor(data4_selected_MeansTravel) + as.factor(data4_selected_BorderPost) + pop.HOME + HOME_urban_rural_distance..degrees. + as.factor(Month.travel), data=data4 )
+summary(distance.OUT) 
+conf.distance.OUT<-confint(distance.OUT, level=0.95) 
+exp.distance.OUT<-exp(coef(distance.OUT)) 
+exp.conf.distance.OUT<-exp(confint(distance.OUT)) 
 
-time_binary.OUT<- glm(as.factor(High.risk.month) ~ as.factor(subset(data4_selected_occupations, is.na(Occupation_code)==FALSE)) + 
-                        as.factor(subset(data4_selected_genders, is.na(Gender)==FALSE)) + 
-                        as.factor(subset(data4_selected_ReasonTravel, is.na(ReasonTravel)==FALSE)) + 
-                        as.factor(subset(data4_selected_MeansTravel, is.na(MeansTravel)==FALSE)),
-                      data=data4, family=binomial(link=logit))
-summary(time_binary.OUT) 
-conf.time_binary.OUT<-confint(time_binary.OUT, level=0.95) 
-exp.time_binary.OUT<-exp(coef(time_binary.OUT)) 
-exp.conf.time_binary.OUT<-exp(confint(time_binary.OUT)) 
+travel_prevalence.OUT<- glm(falciparum_travel_prevalence ~ as.factor(data4_selected_occupations) + as.factor(data4_selected_genders) + as.factor(data4_selected_ReasonTravel) + as.factor(data4_selected_BorderPost) + pop.HOME + HOME_urban_rural_distance..degrees. , data=data4)
+summary(travel_prevalence.OUT) 
+conf.travel_prevalence.OUT<-confint(travel_prevalence.OUT, level=0.95) 
+exp.travel_prevalence.OUT<-exp(coef(travel_prevalence.OUT)) 
+exp.conf.travel_prevalence.OUT<-exp(confint(travel_prevalence.OUT)) 
+
+time.OUT<- glm(as.factor(High.risk.month) ~ as.factor(data4_selected_occupations) + as.factor(data4_selected_ReasonTravel) + as.factor(data4_selected_MeansTravel) + as.factor(data4_selected_BorderPost) + as.factor(HOME_urban_rural_distance..degrees.), data=data4, family=binomial(link=logit))
+summary(time.OUT) 
+conf.time.OUT<-confint(time.OUT, level=0.95) 
+exp.time.OUT<-exp(coef(time.OUT)) 
+exp.conf.time.OUT<-exp(confint(time.OUT)) #redo with multinomial 
+
+Month.travel_relevel<-relevel(as.factor(data4$Month.travel.name), ref="Jan") # base month against which to compare probability of travel during each other month (for each variable, e.g. each age class)
+time.OUT<-multinom(Month.travel_relevel~ as.factor(age_class) + as.factor(data4_selected_occupations) + as.factor(data4_selected_genders) + as.factor(data4_selected_ReasonTravel) + as.factor(data4_selected_MeansTravel) + as.factor(data4_selected_BorderPost) + pop.HOME + HOME_urban_rural_distance..degrees., data = data4) 
+summary(time.OUT)
+coef.time.OUT<-coef(time.OUT) #stand alone coefficients of model 
+summary(time.OUT)$standard.errors #stand alone standard errors of model
+exp.time.OUT<-exp(coef(time.OUT)) 
+confint(time.OUT,level = 0.95)
+conf.time.OUT<-exp(confint(time.OUT))
+time.OUT_zvalues<-summary(time.OUT)$coefficients/summary(time.OUT)$standard.errors #gives z values
+time.OUT_zvalues
+time.OUT_pvalues<-pnorm(abs(time.OUT_zvalues), lower.tail=FALSE)*2#gives p values 
+time.OUT_pvalues
+time.OUT_signif <- symnum(time.OUT_pvalues, corr = FALSE, na = FALSE, 
+                                                   cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1), symbols = c("***", "**", "*", ".", " "), legend = TRUE ) #gives significance stars
+paste(time.OUT_pvalues,time.OUT_signif, sep = " ")# gives table with p values and significance stars
 
 
-#e.g. ln(OR) of a manual labourer, male,  travelling for 'visiting' by truck = 1.548142e+00 (1) + 2.374444e+00 (1) + 2.608711e+00 (1)+ 9.271252e+05(1) + 1.760415e+00
+
+duration.OUT<- glm(log(nightsaway) ~ as.factor(data4_selected_age_nightsawaydata) + as.factor(data4_selected_ReasonTravel_nightsawaydata) + as.factor(data4_selected_BorderPost_nightsawaydata), data=subset(data4, nightsaway!="0"))
+summary(duration.OUT) 
+conf.duration.OUT<-confint(duration.OUT, level=0.95) 
+exp.duration.OUT<-exp(coef(duration.OUT)) 
+exp.conf.duration.OUT<-exp(confint(duration.OUT)) 
 
 
-#e.g. ln(OR) of a factory worker, female, travelling for 'other' by foot =  7.947335e-01(1) + 0 + 0 + 9.931963e-01 (1) +1.760415e+00
-   
-  
+
+
 # ###displaying results in table ------------------------------------------
 library(stargazer)
 
-stargazer (malaria_Travel_in_out, malaria_distance.OUT, malaria_travel_prevalence.OUT, malaria_time.OUT, malaria_time_binary.OUT, malaria_country.OUT, malaria_duration.OUT, type = "html", title = "Coefficients, standard error and significance of t / z values for univariate logistic models of variables affecting malaria incidence", style = "default", 
+stargazer (malaria_Travel_in_out, malaria_distance.OUT, malaria_travel_prevalence.OUT, malaria_time.OUT, malaria_country.OUT, malaria_duration.OUT, type = "html", title = "Coefficients, standard error and significance of t / z values for univariate logistic models of variables affecting malaria incidence", style = "default", 
            summary = NULL, out = "regression_table_malaria.html", out.header = FALSE,
            column.labels = NULL, column.separate = NULL,
            covariate.labels = NULL, dep.var.caption = "Malaria incidence models",
            dep.var.labels = NULL, dep.var.labels.include = FALSE,
            notes = "(1) malaria ~ international or domestic travel, (2) malaria ~ distance, (3) malaria ~ P. falcip prevalence, (4) malaria ~ time of year (5) malaria ~ country", notes.align = "l")
-stargazer (malaria_time_binary.OUT, type = "html", title = "Coefficients, standard error and significance of t / z values for univariate logistic models of variables affecting malaria incidence", style = "default", 
+stargazer (malaria_time.OUT, type = "html", title = "Coefficients, standard error and significance of t / z values for univariate logistic models of variables affecting malaria incidence", style = "default", 
            summary = NULL, out = "regression_table_malaria_time.html", out.header = FALSE,
            column.labels = NULL, column.separate = NULL,
            covariate.labels = NULL, dep.var.caption = "Malaria incidence models",
@@ -1285,13 +1372,6 @@ stargazer (time_binary_age.OUT,time_binary_occupation.OUT,time_binary_gender.OUT
            covariate.labels = NULL, dep.var.caption = "High vs. low risk month travel models",
            dep.var.labels = NULL, dep.var.labels.include = FALSE,star.cutoffs = c( 0.05, 0.01, 0.001),
            notes = "(1) High.risk.month ~ age, (2) High.risk.month ~ occupation, (3) High.risk.month ~ gender, (4) High.risk.month ~ reason for travel (5) High.risk.month ~ travel means (6) High.risk.month ~ border post (7) High.risk.month ~ home population (8) High.risk.month ~ home distance to nearest urban centre", notes.align = "l")
-stargazer (time_binary_occupation.OUT,   type = "html", 
-           title = "Coefficients standard error and significance of t / z values for univariate logistic models of variables affecting month travelled (high vs. low risk)", style = "default", 
-           summary = NULL, out = "regression_table_time_binary_occupation.html", out.header = FALSE,
-           column.labels = NULL, column.separate = NULL,
-           covariate.labels = c("farming / agriculture", "manufacturing / factory", "office / clerical work", "other", "other manual labour", "student",  "reference category - unemployed"), dep.var.caption = "High vs. low risk month travel model",
-           dep.var.labels = NULL, dep.var.labels.include = FALSE,star.cutoffs = c( 0.05, 0.01, 0.001),
-           notes = "High.risk.month ~ occupation", notes.align = "l")
 stargazer (time_binary_gender.OUT,   type = "html", 
            title = "Coefficients standard error and significance of t / z values for univariate logistic models of variables affecting month travelled (high vs. low risk)", style = "default", 
            summary = NULL, out = "regression_table_time_binary_gender.html", out.header = FALSE,
@@ -1314,6 +1394,21 @@ stargazer (time_binary_border_post.OUT,   type = "html",
            dep.var.labels = NULL, dep.var.labels.include = FALSE,star.cutoffs = c( 0.05, 0.01, 0.001),
            notes = "High.risk.month ~ border_post", notes.align = "l")
 
+
+
+
+
+
+
+stargazer (time_age.OUT,time_occupation.OUT,time_gender.OUT,time_reason_travel.OUT, time_means_travel.OUT, 
+           time_border_post.OUT, time_pop_HOME.OUT, time_pop_urban_rural_distance.OUT,   type = "html", 
+           title = "Coefficients standard error and significance of t / z values for univariate logistic models of variables affecting month travelled", style = "default", 
+           summary = NULL, out = "regression_table_time.html", out.header = FALSE,
+           column.labels = NULL, column.separate = NULL,
+           covariate.labels = NULL, dep.var.caption = "Month of travel models",
+           dep.var.labels = NULL, dep.var.labels.include = FALSE,star.cutoffs = c( 0.05, 0.01, 0.001),
+           notes = "(1 - 12) month of travel ~ age, (13-24) month of travel ~ occupation, (25-36) month of travel ~ gender, (37-48) month of travel ~ reason for travel (49-60) month of travel ~ travel means (61-72) month of travel ~ border post (73-84) month of travel ~ home population (85-96) month of travel ~ home distance to nearest urban centre xx", notes.align = "l")
+
 stargazer (duration_age.OUT,duration_occupation.OUT,duration_gender.OUT,duration_reason_travel.OUT, duration_means_travel.OUT, 
            duration_border_post.OUT, duration_pop_HOME.OUT, duration_pop_urban_rural_distance.OUT,   type = "html", 
            title = "Coefficients standard error and significance of t / z values for univariate logistic models of variables affecting travel duration", style = "default", 
@@ -1323,17 +1418,18 @@ stargazer (duration_age.OUT,duration_occupation.OUT,duration_gender.OUT,duration
            dep.var.labels = NULL, dep.var.labels.include = FALSE,star.cutoffs = c( 0.05, 0.01, 0.001),
            notes = "(1) travel duration ~ age, (2) travel duration ~ occupation, (3) travel duration ~ gender, (4) travel duration ~ reason for travel (5) travel duration ~ travel means (6) travel duration ~ border post (7) travel duration ~ home population (8) travel duration ~ home distance to nearest urban centre", notes.align = "l")
 
-stargazer (time_binary.OUT,  type = "html", 
+stargazer (distance.OUT,travel_prevalence.OUT, time.OUT, duration.OUT ,  type = "html", 
            title = "Coefficients standard error and significance of t / z values for multimple linear and logistic models of variables affecting distance, travel P. falcip prevalence and month of travel", style = "default", 
            summary = NULL, out = "regression_table_multiple.html", out.header = FALSE,
            column.labels = NULL, column.separate = NULL,
            covariate.labels = NULL, dep.var.caption = "Dependent variable",
            dep.var.labels = c("distance", "travel P.falcip. prevalence", "month of travel"), dep.var.labels.include = FALSE,star.cutoffs = c( 0.05, 0.01, 0.001),
-           notes = "(1) high risk month ~ occupation + gender + travel purpose + mode of transport", notes.align = "l")
+           notes = "(1) distance ~ multiple, (2) travel P. falcip. prevalence ~ multiple, (3) month of travel ~ multiple", notes.align = "l")
 
 
-stargazer (data4[c("Malaria_0_1","Travel_in_out","Country","nightsaway", "High.risk.month", "Year.travel","ReasonTravel","MeansTravel",
-          "BorderPost","Age","Gender", "Occupation", "Occupation_code", "HOME_urban_rural_distance..degrees.",
+stargazer (data4[c("Malaria_0_1","TYPE","Travel_in_out","Country","nightsaway", 
+          "Month.travel", "High.risk.month", "Year.travel","ReasonTravel","MeansTravel",
+          "BorderPost","Age","age_class","Gender", "Occupation", "Occupation_code", "HOME_urban_rural_distance..degrees.",
           "pop.HOME", "falciparum_travel_prevalence","Lon_EA_HOME","lat_EA_HOME","lon_to", "lat_to", "distance_out")], type = "html", 
           title = "Summary statistics for all individuals surveyed who travelled outside of Swaziland", style = "default", 
           summary.stat =  c("n","mean","median","max","min","sd"), out = "summary_stats_data4.html", out.header = FALSE,
@@ -1345,7 +1441,7 @@ stargazer (data4_malarianegative[c("Malaria_0_1","TYPE","Travel_in_out","Country
                    "Month.travel", "High.risk.month",  "Year.travel","ReasonTravel","MeansTravel",
                    "BorderPost","Age","age_class","Gender", "Occupation", "Occupation_code", "HOME_urban_rural_distance..degrees.",
                    "pop.HOME", "falciparum_travel_prevalence","Lon_EA_HOME","lat_EA_HOME","lon_to", "lat_to", "distance_out")], type = "html", 
-           title = "Summary statistics for all malaria negative individuals surveyed who travelled outside of Swaziland, Malaria negative", style = "default", 
+           title = "Summary statistics for all malaria negative individuals surveyed who travelled outside of Swaziland", style = "default", 
            summary.stat =  c("n","mean","median","max","min","sd"), out = "summary_stats_data4_malarianegative.html", out.header = FALSE,
            column.labels = NULL, column.separate = NULL,
            covariate.labels = NULL, dep.var.caption = "",
@@ -1355,7 +1451,7 @@ stargazer (data4_malariapositive[c("Malaria_0_1","TYPE","Travel_in_out","Country
                                    "Month.travel", "High.risk.month",  "Year.travel","ReasonTravel","MeansTravel",
                                    "BorderPost","Age","age_class","Gender", "Occupation", "Occupation_code", "HOME_urban_rural_distance..degrees.",
                                    "pop.HOME", "falciparum_travel_prevalence","Lon_EA_HOME","lat_EA_HOME","lon_to", "lat_to", "distance_out")], type = "html", 
-           title = "Summary statistics for all malaria positive individuals surveyed who travelled outside of Swaziland, malaria positive", style = "default", 
+           title = "Summary statistics for all malaria positive individuals surveyed who travelled outside of Swaziland", style = "default", 
            summary.stat =  c("n","mean","median","max","min","sd"), out = "summary_stats_data4_malariapostitive.html", out.header = FALSE,
            column.labels = NULL, column.separate = NULL,
            covariate.labels = NULL, dep.var.caption = "",
@@ -1409,7 +1505,7 @@ high_risk_month_vs_rural_urban_distance_function<- ggplot(data=data.frame(x=0), 
 plot(malaria_Travel_in_out)
 plot(malaria_distance.OUT)
 plot(malaria_travel_prevalence.OUT)
-plot(malaria_time_binary.OUT)
+plot(malaria_time.OUT)
 plot(malaria_country.OUT)
 plot(malaria_duration.OUT)
 plot(distance_age.OUT)
@@ -1455,30 +1551,13 @@ plot(duration_pop_HOME.OUT)
 plot(duration_pop_urban_rural_distance.OUT)
 plot(distance.OUT)
 plot(travel_prevalence.OUT)
-plot(time_binary.OUT)
+plot(time.OUT)
 plot(duration.OUT)
 
 
 
 # Test if variables meet model assumptions -----------------------------------------------------
-##for multiple linear regression models 
-
-######All model datasets met the basic assumptions of the relevant regression: 
-######Linear regression:
-######  1.	Linear relationship between independent and dependent variable: all continuous independent and continuous dependent variables were plotted and Pearson’s Product Moment Correlation Coefficient (PPMCC) used to test for significant correlation. Box plots were used to test linear relationship between ordinal independent variables and continuous dependent variables. QQ plots were used to test for linearity amongst nominal, ordinal and continuous independent variables and continuous dependent variables. In all cases, variables which were not approximately linearly related (p values >0.05 for PPMCC) were not included in linear regression analyses.
-######2.	Normal distribution of model residuals: for models with continuous dependent variables, QQ plots used to test residual normality and any models with non-normally distributed residuals were removed. All continuous variables were plotted in order to ensure sample values were approximately normally distributed and log transformed if necessary. N/A for ordinal and nominal independent variables. 
-######3.	Homoscedasticity: xx? 
-  
-######logistic regression:
-######1.	Linear relationship between independent and ln(odds) of dependent variable: N/A xx There are plots of variance that we can use to look at these, we'll chat on Thursday about it.
-######2.	Normal distribution of model residuals: for models with binary dependent variables, QQ plots used to test residual normality and any models with non-normally distributed residuals were removed xx?.
-######3.	Homoscedasticity: xx?
-
-######multiple linear or logistic regression:
-######4.	Little or no multicollinearity between independent variables where relevant: when constructing multiple regression models, the effect of removing each biologically related variable on other covariates in the model was tested to ensure no significant changes to the rest of the model were induced once a variable was omitted. 
-
-######(https://onlinelibrary.wiley.com/doi/pdf/10.1111/ceo.12358). 
-
+##for multiple linear regression models
 
 ##1 linear relationship between independent and dependent variables (or log(odds) for logistic regression)
 ### check QQ plots
@@ -1541,8 +1620,8 @@ vif(distance.OUT) # variance inflation factors . Remove data4_selected_MeansTrav
 sqrt(vif(distance.OUT))
 vif(travel_prevalence.OUT) # variance inflation factors . Removed none. 
 sqrt(vif(travel_prevalence.OUT))
-vif(time_binary.OUT) # variance inflation factors 
-sqrt(vif(time_binary.OUT))
+vif(time.OUT) # variance inflation factors 
+sqrt(vif(time.OUT))
 vif(duration.OUT) # variance inflation factors . Removed none. 
 sqrt(vif(duration.OUT))
 #######As a rule of thumb, if the VIF of a variable exceeds 10, which will happen if multiple correlation coefficient for j-th variable R2jRj2 exceeds 0.90, that variable is said to be highly collinear.
@@ -1586,7 +1665,7 @@ ggplot()+geom_density(data = data4 , aes(x=log(distance_urban_rural_km))) ## xx 
 lmtest::bptest(malaria_Travel_in_out) heteroscedastic 
 lmtest::bptest(malaria_distance.OUT) heteroscedastic 
 lmtest::bptest(malaria_travel_prevalence.OUT)
-lmtest::bptest(malaria_time_binary.OUT)
+lmtest::bptest(malaria_time.OUT)
 lmtest::bptest(malaria_country.OUT)
 lmtest::bptest(malaria_duration.OUT)
 lmtest::bptest(distance_age.OUT)
@@ -1624,7 +1703,7 @@ lmtest::bptest(duration_pop_HOME.OUT)
 lmtest::bptest(duration_pop_urban_rural_distance.OUT)
 lmtest::bptest(distance.OUT)
 lmtest::bptest(travel_prevalence.OUT)
-lmtest::bptest(time_binary.OUT)
+lmtest::bptest(time.OUT)
 lmtest::bptest(duration.OUT)
 
 
@@ -1678,17 +1757,17 @@ plot(xseq, densities, col="darkgreen",xlab="Sequence in travel_prevalence range"
 # Maps --------------------------------------------------------------------
 
 library(ggmap)
-#locations<-geocode(location=c("Golela Border, Swaziland",
- #                             "Lomahasha Border, Swaziland", 
-  #                            "Mpumalanga Border, South Africa",
-   #                           "Mananga, 1354, South Africa",
-    #                          "Jeppes Reef, South Africa",
-     #                         "Matsapha Airport, Swaziland",
-      #                        "Mhlumeni Boder Post, Swaziland",
-       #                       "N17, Oshoek, 2350, South Africa",
-        #                      "Onverwacht Border Post, South Africa",
-         #                     "Sandlane Border, South Africa",
-          #                    "Sicunusa Border post, Swaziland"),output="latlon", source="google") #get latlong table (but wrong coordinates) - best way to do this in future is to use online geocoding software
+locations<-geocode(location=c("Golela Border, Swaziland",
+                              "Lomahasha Border, Swaziland", 
+                              "Mpumalanga Border, South Africa",
+                              "Mananga, 1354, South Africa",
+                              "Jeppes Reef, South Africa",
+                              "Matsapha Airport, Swaziland",
+                              "Mhlumeni Boder Post, Swaziland",
+                              "N17, Oshoek, 2350, South Africa",
+                              "Onverwacht Border Post, South Africa",
+                              "Sandlane Border, South Africa",
+                              "Sicunusa Border post, Swaziland"),output="latlon", source="google") #get latlong table (but wrong coordinates) - best way to do this in future is to use online geocoding software
 data4_BorderPost_selected<-subset(data4, BorderPost  %in% c("Lavumisa/Golela"     , "Lomahasha/Namaacha",   "Mahamba"     ,         "Mananga"      ,       
                                                     "Matsamo/Jeppe's Reef", "Matsapha Airport" ,    "Mhlumeni/Goba"   ,     "Ngwenya/Oshoek" ,                    
                                                     "Salitje/Onverwacht" ,  "Sandlane/Nerston" ,    "Sicunusa/Houtkop")) # select only BorderPosts not 'other' or '""'
@@ -1713,8 +1792,8 @@ BorderPostTable<-data.frame(BorderPostTable, Borderlon, Borderlat)
 
 
 library(ggmap)
-zambia_coordinates <- c(lon = 31.8, lat = -22)
-import_map<-get_map(location=zambia_coordinates,zoom=5, maptype = "roadmap", source = "google")
+zambia_coordinates <- c(lon = 30.744645, lat = -10.869654)
+import_map<-get_map(location=zambia_coordinates,zoom=4, maptype = "satellite", source = "google")
 
 BorderPost_map<-ggmap(import_map) + 
   geom_point(data = BorderPostTable, aes(x=Borderlon,y=Borderlat)) 
@@ -1735,15 +1814,7 @@ BorderPost_low_risk_month_map<-ggmap(import_map, base_layer = ggplot(data4, aes(
   geom_point(data=subset(data4, High.risk.month==0), color="blue", size=0.5) 
 BorderPost_low_risk_month_map
 
-falcip_binomial_map<-ggmap(import_map, base_layer = ggplot( data4, aes(x=lon_to , y=lat_to))) +
-                                geom_point(data=subset(data4,falciparum_travel_prevalence>0.07&falciparum_travel_prevalence<0.1), color="red", size=0.5)+
-                                geom_point(data=subset(data4,falciparum_travel_prevalence>0.17&falciparum_travel_prevalence<0.25), color="blue", size=0.5)
-  
 
-
-install.packages("tiff")
-library(tiff)
-readTIFF(source="2015_Nature_Africa_PR.2012.tif", native = TRUE)
 
 qmap("SO51 6RN", zoom=15, maptype="satellite")
 
@@ -1794,9 +1865,6 @@ ggsave("prevalence_and_time_binary_continuous_distribution_histogram.png",plot=p
 ggsave("histogram_cases_per_travel_month_datain.png",plot=histogram_cases_per_travel_month_datain,path = "/Users/katiehickson/Library/Mobile Documents/com~apple~CloudDocs/Katie files 01-03-18.16/3. Exectution/Flowminder Internship 2017-18/CHAI Malaria Elimination Research/Analysis/Code and Data 2012-2014/CHAI Malaria 20-03-18")
 ggsave("histogram_cases_per_firstentered_month_datain.png",plot=histogram_cases_per_firstentered_month_datain,path = "/Users/katiehickson/Library/Mobile Documents/com~apple~CloudDocs/Katie files 01-03-18.16/3. Exectution/Flowminder Internship 2017-18/CHAI Malaria Elimination Research/Analysis/Code and Data 2012-2014/CHAI Malaria 20-03-18")
 ggsave("cases_each_travel_month.png",plot=cases_each_travel_month,path = "/Users/katiehickson/Library/Mobile Documents/com~apple~CloudDocs/Katie files 01-03-18.16/3. Exectution/Flowminder Internship 2017-18/CHAI Malaria Elimination Research/Analysis/Code and Data 2012-2014/CHAI Malaria 20-03-18")
-ggsave("reasontravel_cases_each_travel_month.png",plot=reasontravel_cases_each_travel_month,path = "/Users/katiehickson/Library/Mobile Documents/com~apple~CloudDocs/Katie files 01-03-18.16/3. Exectution/Flowminder Internship 2017-18/CHAI Malaria Elimination Research/Analysis/Code and Data 2012-2014/CHAI Malaria 20-03-18")
-
-
 
 
 
@@ -1813,7 +1881,6 @@ ggsave("High_risk_month_vs_non_Mhlumeni_Goba_travel_frequency.png", plot=High_ri
 ##plots for graphs of model outputs 
 ggsave("high_risk_month_vs_rural_urban_distance_scatter.png", plot=high_risk_month_vs_rural_urban_distance_scatter,path = "/Users/katiehickson/Library/Mobile Documents/com~apple~CloudDocs/Katie files 01-03-18.16/3. Exectution/Flowminder Internship 2017-18/CHAI Malaria Elimination Research/Analysis/Code and Data 2012-2014/CHAI Malaria 20-03-18")
 ggsave("high_risk_month_vs_rural_urban_distance_function.png", plot=high_risk_month_vs_rural_urban_distance_function,path = "/Users/katiehickson/Library/Mobile Documents/com~apple~CloudDocs/Katie files 01-03-18.16/3. Exectution/Flowminder Internship 2017-18/CHAI Malaria Elimination Research/Analysis/Code and Data 2012-2014/CHAI Malaria 20-03-18")
-
 
 
 
